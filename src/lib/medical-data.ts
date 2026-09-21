@@ -39,6 +39,12 @@ export async function saveShift(value: Omit<Shift, "id"> & { id?: string }) {
   const result = value.id ? await supabase.from("shifts").update(payload).eq("id", value.id) : await supabase.from("shifts").insert(payload);
   if (result.error) throw result.error;
 }
+export async function saveShifts(values: Array<Omit<Shift, "id">>) {
+  const uid = await userId();
+  const payload = values.map((value) => ({ user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes }));
+  const result = await supabase.from("shifts").insert(payload);
+  if (result.error) throw result.error;
+}
 export async function removeRecord(table: "hospitals" | "shift_types" | "shifts", id: string) {
   const result = await supabase.from(table).delete().eq("id", id);
   if (result.error) throw result.error;
