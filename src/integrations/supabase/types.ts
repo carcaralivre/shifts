@@ -14,7 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      calendar_feeds: {
+        Row: {
+          created_at: string
+          id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hospitals: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          payment_day: number
+          payment_delay: number
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          payment_day?: number
+          payment_delay?: number
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          payment_day?: number
+          payment_delay?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shift_types: {
+        Row: {
+          base_amount: number
+          created_at: string
+          has_variable: boolean
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          base_amount?: number
+          created_at?: string
+          has_variable?: boolean
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          base_amount?: number
+          created_at?: string
+          has_variable?: boolean
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shifts: {
+        Row: {
+          base_amount: number
+          created_at: string
+          hospital_id: string
+          id: string
+          notes: string | null
+          shift_date: string
+          shift_type_id: string
+          user_id: string
+          variable_amount: number
+        }
+        Insert: {
+          base_amount?: number
+          created_at?: string
+          hospital_id: string
+          id?: string
+          notes?: string | null
+          shift_date: string
+          shift_type_id: string
+          user_id: string
+          variable_amount?: number
+        }
+        Update: {
+          base_amount?: number
+          created_at?: string
+          hospital_id?: string
+          id?: string
+          notes?: string | null
+          shift_date?: string
+          shift_type_id?: string
+          user_id?: string
+          variable_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shifts_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shifts_shift_type_id_fkey"
+            columns: ["shift_type_id"]
+            isOneToOne: false
+            referencedRelation: "shift_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
