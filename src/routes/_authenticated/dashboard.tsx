@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 const colors: Record<string,string>={emerald:"bg-hospital-emerald",sage:"bg-hospital-sage",blue:"bg-hospital-blue",gold:"bg-hospital-gold",rose:"bg-hospital-rose"};
 const brl=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v);
-const brlWhole=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0}).format(v);
+const brlWhole=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0}).format(v).replace(/\s/g,"");
 const monthLabel=(d:Date)=>format(d,"MMMM yyyy",{locale:ptBR});
 function errorMessage(cause:unknown){
  if(cause instanceof Error)return cause.message;
