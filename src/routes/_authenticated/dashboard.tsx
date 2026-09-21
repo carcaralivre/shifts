@@ -23,6 +23,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 const colors: Record<string,string>={emerald:"bg-hospital-emerald",sage:"bg-hospital-sage",blue:"bg-hospital-blue",gold:"bg-hospital-gold",rose:"bg-hospital-rose"};
 const brl=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v);
 const monthLabel=(d:Date)=>format(d,"MMMM yyyy",{locale:ptBR});
+function errorMessage(cause:unknown){
+ if(cause instanceof Error)return cause.message;
+ if(typeof cause==="object"&&cause!==null&&"message" in cause&&typeof cause.message==="string"){
+  if("code" in cause&&cause.code==="23505")return "Já existe um tipo com esse nome neste hospital.";
+  return cause.message;
+ }
+ return "Não foi possível salvar o tipo de plantão.";
+}
 
 function Dashboard(){
  const navigate=useNavigate(); const qc=useQueryClient(); const {data}=useQuery({queryKey:["medical-data"],queryFn:loadMedicalData});
@@ -80,7 +88,7 @@ function TypeDialog({open,onOpenChange,value,hospitals,onSaved}:{open:boolean;on
    await saveShiftType(value?{...payload,id:value.id}:payload);
    await onSaved();
    onOpenChange(false);
-  }catch(cause){setError(cause instanceof Error?cause.message:"Não foi possível salvar o tipo de plantão.");setSaving(false)}
+  }catch(cause){setError(errorMessage(cause));setSaving(false)}
  }
  return <Dialog open={open} onOpenChange={(next)=>{if(!saving)onOpenChange(next)}}><DialogContent><DialogHeader><DialogTitle>{value?"Editar tipo":"Novo tipo de plantão"}</DialogTitle><DialogDescription>Defina o hospital e a remuneração padrão deste formato.</DialogDescription></DialogHeader><form key={value?.id??"new"} className="space-y-4" noValidate onSubmit={submit}><Field label="Hospital"><Select value={hospitalId} onValueChange={setHospitalId} disabled={saving}><SelectTrigger><SelectValue placeholder="Selecione um hospital"/></SelectTrigger><SelectContent>{hospitals.map(h=><SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>)}</SelectContent></Select></Field><Field label="Nome"><Input name="name" defaultValue={value?.name??""} disabled={saving} required/></Field><Field label="Remuneração base"><Input name="base" type="text" inputMode="decimal" defaultValue={value?.base_amount??0} disabled={saving} required/></Field><div className="flex items-center justify-between rounded-lg border bg-surface p-3"><div><Label htmlFor="variable">Produção variável</Label><p className="mt-1 text-xs text-muted-foreground">Permite informar um valor adicional somente neste tipo.</p></div><Switch id="variable" checked={variable} onCheckedChange={setVariable} disabled={saving}/></div>{error&&<p role="alert" className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}<DialogFooter><Button type="button" variant="outline" onClick={()=>onOpenChange(false)} disabled={saving}>Cancelar</Button><Button type="submit" disabled={saving||!hospitalId}>{saving?<><Loader2 className="animate-spin" strokeWidth={1.5}/>Salvando...</>:"Salvar tipo"}</Button></DialogFooter></form></DialogContent></Dialog>
 }
