@@ -70,6 +70,7 @@ export type Database = {
           base_amount: number
           created_at: string
           has_variable: boolean
+          hospital_id: string | null
           id: string
           name: string
           user_id: string
@@ -78,6 +79,7 @@ export type Database = {
           base_amount?: number
           created_at?: string
           has_variable?: boolean
+          hospital_id?: string | null
           id?: string
           name: string
           user_id: string
@@ -86,11 +88,20 @@ export type Database = {
           base_amount?: number
           created_at?: string
           has_variable?: boolean
+          hospital_id?: string | null
           id?: string
           name?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "shift_types_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shifts: {
         Row: {
