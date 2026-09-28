@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Copy the calendar subscription URL from the public custom domain rather than the current preview origin, because external calendar apps cannot access protected preview URLs.
