@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/public/calendar/$token")({
       const date = item.shift_date.replaceAll("-", "");
       const hospital = Array.isArray(item.hospitals) ? item.hospitals[0]?.name : item.hospitals?.name;
       const kind = Array.isArray(item.shift_types) ? item.shift_types[0]?.name : item.shift_types?.name;
-      return [`BEGIN:VEVENT`,`UID:${date}-${index}-${params.token}@plantoes`,`DTSTART;VALUE=DATE:${date}`,`SUMMARY:${clean(`${hospital ?? "Hospital"} — ${kind ?? "Plantão"}`)}`,`DESCRIPTION:${clean(`Valor previsto: R$ ${Number(item.base_amount) + Number(item.variable_amount)}`)}`,`END:VEVENT`].join("\r\n");
+      return [`BEGIN:VEVENT`,`UID:${date}-${index}-${params.token}@plantoes`,`DTSTART;VALUE=DATE:${date}`,`SUMMARY:${clean(`${hospital ?? "Hospital"} ${kind ?? "Plantão"}`)}`,`DESCRIPTION:${clean(`Valor previsto: R$ ${Number(item.base_amount) + Number(item.variable_amount)}`)}`,`END:VEVENT`].join("\r\n");
     }).join("\r\n");
     const body = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Meus Plantoes//BR\r\nCALSCALE:GREGORIAN\r\nX-WR-TIMEZONE:America/Sao_Paulo\r\n${events}\r\nEND:VCALENDAR`;
     return new Response(body, { headers: { "content-type": "text/calendar; charset=utf-8", "content-disposition": "inline; filename=plantoes.ics" } });
