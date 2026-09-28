@@ -66,7 +66,7 @@ function Dashboard(){
   setFeedStatus("copying");
   try{
    const token=data?.feedToken??await ensureCalendarFeed();
-   const url=`${window.location.origin}/api/public/calendar/${token}`;
+    const url=`https://plantao.cabservicosmedicos.com.br/api/public/calendar/${token}`;
    await copyText(url);
    if(!data?.feedToken)await refresh();
    setFeedStatus("copied");
