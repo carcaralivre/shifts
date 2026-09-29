@@ -29,6 +29,13 @@
       "when": 1790021455528,
       "tag": "0003_scope_shift_type_name_to_hospital",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790709082952,
+      "tag": "0004_add_optional_shift_period",
+      "breakpoints": true
     }
   ]
 }

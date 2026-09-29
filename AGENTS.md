@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Copy the calendar subscription URL from the public custom domain rather than the current preview origin, because external calendar apps cannot access protected preview URLs.
+- Store the optional shift period on each shift, not its type, because day/night can vary per scheduled occurrence.

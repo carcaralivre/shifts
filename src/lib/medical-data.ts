@@ -2,13 +2,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type Hospital = { id: string; name: string; color: string; payment_day: number; payment_delay: number };
 export type ShiftType = { id: string; hospital_id: string | null; name: string; base_amount: number; has_variable: boolean };
-export type Shift = { id: string; shift_date: string; hospital_id: string; shift_type_id: string; base_amount: number; variable_amount: number; notes: string | null };
+export type ShiftPeriod = "day" | "night";
+export type Shift = { id: string; shift_date: string; hospital_id: string; shift_type_id: string; base_amount: number; variable_amount: number; notes: string | null; shift_period: ShiftPeriod | null };
 
 export async function loadMedicalData() {
   const [hospitals, shiftTypes, shifts, feed] = await Promise.all([
     supabase.from("hospitals").select("id,name,color,payment_day,payment_delay").order("name"),
     supabase.from("shift_types").select("id,hospital_id,name,base_amount,has_variable").order("name"),
-    supabase.from("shifts").select("id,shift_date,hospital_id,shift_type_id,base_amount,variable_amount,notes").order("shift_date"),
+    supabase.from("shifts").select("id,shift_date,hospital_id,shift_type_id,base_amount,variable_amount,notes,shift_period").order("shift_date"),
     supabase.from("calendar_feeds").select("token").maybeSingle(),
   ]);
   const error = hospitals.error ?? shiftTypes.error ?? shifts.error ?? feed.error;
@@ -35,13 +36,13 @@ export async function saveShiftType(value: Omit<ShiftType, "id"> & { id?: string
 }
 export async function saveShift(value: Omit<Shift, "id"> & { id?: string }) {
   const uid = await userId();
-  const payload = { user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes };
+  const payload = { user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes, shift_period: value.shift_period };
   const result = value.id ? await supabase.from("shifts").update(payload).eq("id", value.id) : await supabase.from("shifts").insert(payload);
   if (result.error) throw result.error;
 }
 export async function saveShifts(values: Array<Omit<Shift, "id">>) {
   const uid = await userId();
-  const payload = values.map((value) => ({ user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes }));
+  const payload = values.map((value) => ({ user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes, shift_period: value.shift_period }));
   const result = await supabase.from("shifts").insert(payload);
   if (result.error) throw result.error;
 }
