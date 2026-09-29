@@ -111,6 +111,7 @@ export type Database = {
           id: string
           notes: string | null
           shift_date: string
+          shift_period: string | null
           shift_type_id: string
           user_id: string
           variable_amount: number
@@ -122,6 +123,7 @@ export type Database = {
           id?: string
           notes?: string | null
           shift_date: string
+          shift_period?: string | null
           shift_type_id: string
           user_id: string
           variable_amount?: number
@@ -133,6 +135,7 @@ export type Database = {
           id?: string
           notes?: string | null
           shift_date?: string
+          shift_period?: string | null
           shift_type_id?: string
           user_id?: string
           variable_amount?: number
