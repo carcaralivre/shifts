@@ -59,3 +59,16 @@ export async function ensureCalendarFeed() {
   if (created.error) throw created.error;
   return created.data.token;
 }
+export type RevenueGoal = { month: string; amount: number };
+export async function loadRevenueGoals() {
+  const result = await supabase.from("revenue_goals").select("month,amount");
+  if (result.error) throw result.error;
+  return (result.data ?? []).map((g) => ({ month: g.month, amount: Number(g.amount) })) as RevenueGoal[];
+}
+export async function saveRevenueGoal(month: string, amount: number | null) {
+  const uid = await userId();
+  const result = amount === null
+    ? await supabase.from("revenue_goals").delete().eq("user_id", uid).eq("month", month)
+    : await supabase.from("revenue_goals").upsert({ user_id: uid, month, amount }, { onConflict: "user_id,month" });
+  if (result.error) throw result.error;
+}
