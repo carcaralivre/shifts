@@ -36,6 +36,13 @@
       "when": 1790709082952,
       "tag": "0004_add_optional_shift_period",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790710278724,
+      "tag": "0005_create_revenue_goals",
+      "breakpoints": true
     }
   ]
 }
