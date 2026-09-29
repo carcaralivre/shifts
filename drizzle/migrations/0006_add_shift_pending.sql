@@ -1,0 +1,1 @@
+ALTER TABLE public.shifts ADD COLUMN is_pending boolean NOT NULL DEFAULT false;

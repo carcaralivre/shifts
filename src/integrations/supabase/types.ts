@@ -133,6 +133,7 @@ export type Database = {
           created_at: string
           hospital_id: string
           id: string
+          is_pending: boolean
           notes: string | null
           shift_date: string
           shift_period: string | null
@@ -145,6 +146,7 @@ export type Database = {
           created_at?: string
           hospital_id: string
           id?: string
+          is_pending?: boolean
           notes?: string | null
           shift_date: string
           shift_period?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           created_at?: string
           hospital_id?: string
           id?: string
+          is_pending?: boolean
           notes?: string | null
           shift_date?: string
           shift_period?: string | null
