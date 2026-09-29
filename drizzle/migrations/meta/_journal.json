@@ -43,6 +43,13 @@
       "when": 1790710278724,
       "tag": "0005_create_revenue_goals",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790710397343,
+      "tag": "0006_add_shift_pending",
+      "breakpoints": true
     }
   ]
 }
