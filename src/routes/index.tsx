@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 function LoginPage() {
   const navigate = useNavigate();
   const setup = useServerFn(ensureInitialUser);
-  const [username, setUsername] = useState("eduardo");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
