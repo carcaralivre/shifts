@@ -32,9 +32,10 @@ function LoginPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError("");
     try {
-      if (username.trim().toLowerCase() !== "eduardo") throw new Error("Usuário ou senha incorretos.");
-      await setup();
-      const result = await supabase.auth.signInWithPassword({ email: "eduardo@plantoes.local", password });
+      const user = username.trim().toLowerCase();
+      if (user !== "eduardo" && user !== "felipe") throw new Error("Usuário ou senha incorretos.");
+      if (user === "eduardo") await setup();
+      const result = await supabase.auth.signInWithPassword({ email: `${user}@plantoes.local`, password });
       if (result.error) throw new Error("Usuário ou senha incorretos.");
       await navigate({ to: "/dashboard" });
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Não foi possível entrar."); }
