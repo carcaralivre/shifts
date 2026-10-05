@@ -20,7 +20,7 @@ export const ensureFelipeUser = createServerFn({ method: "POST" }).handler(async
   const { data } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 100 });
   const existing = data.users.find((user) => user.email === email);
   if (existing) return { ok: true, existed: true };
-  const { error } = await supabaseAdmin.auth.admin.createUser({ email, password: "1234", email_confirm: true });
+  const { error } = await supabaseAdmin.auth.admin.createUser({ email, password: "123456", email_confirm: true });
   if (error) throw new Error(error.message);
   return { ok: true, existed: false };
 });
