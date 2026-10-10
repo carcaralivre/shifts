@@ -63,6 +63,8 @@ function Dashboard(){
  async function setGoal(month:string,amount:number|null){await saveRevenueGoal(month,amount);await qc.invalidateQueries({queryKey:["revenue-goals"]});}
  const monthly=shifts.filter(s=>isSameMonth(parseISO(s.shift_date),scheduleMonth));
  const receivables=shifts.filter(s=>{const h=hospitals.find(x=>x.id===s.hospital_id);return h&&isSameMonth(addMonths(parseISO(s.shift_date),h.payment_delay),paymentMonth)});
+ const receivableGroups=hospitals.map(h=>({hospital:h,items:receivables.filter(s=>s.hospital_id===h.id)})).filter(g=>g.items.length).sort((a,b)=>a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
+ const [openGroups,setOpenGroups]=useState<string[]>([]);
  const total=receivables.reduce((sum,s)=>sum+Number(s.base_amount)+Number(s.variable_amount),0);
  async function logout(){await qc.cancelQueries();qc.clear();await supabase.auth.signOut();await navigate({to:"/",replace:true});}
  async function copyFeed(){
