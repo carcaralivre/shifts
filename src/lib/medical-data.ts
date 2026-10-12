@@ -72,15 +72,16 @@ export async function saveRevenueGoal(month: string, amount: number | null) {
     : await supabase.from("revenue_goals").upsert({ user_id: uid, month, amount }, { onConflict: "user_id,month" });
   if (result.error) throw result.error;
 }
+export type DayMarkType = "gray" | "red";
 export async function loadDayMarks() {
-  const result = await supabase.from("day_marks").select("mark_date");
+  const result = await supabase.from("day_marks").select("mark_date,mark_type");
   if (result.error) throw result.error;
-  return (result.data ?? []).map((m) => m.mark_date as string);
+  return (result.data ?? []).reduce<Record<string, DayMarkType>>((acc, m) => { acc[m.mark_date as string] = (m.mark_type as DayMarkType) ?? "gray"; return acc; }, {});
 }
-export async function toggleDayMark(date: string, mark: boolean) {
+export async function toggleDayMark(date: string, type: DayMarkType | null) {
   const uid = await userId();
-  const result = mark
-    ? await supabase.from("day_marks").upsert({ user_id: uid, mark_date: date }, { onConflict: "user_id,mark_date" })
+  const result = type
+    ? await supabase.from("day_marks").upsert({ user_id: uid, mark_date: date, mark_type: type }, { onConflict: "user_id,mark_date" })
     : await supabase.from("day_marks").delete().eq("user_id", uid).eq("mark_date", date);
   if (result.error) throw result.error;
 }
