@@ -34,13 +34,13 @@ export async function saveShiftType(value: Omit<ShiftType, "id"> & { id?: string
   const result = value.id ? await supabase.from("shift_types").update(payload).eq("id", value.id) : await supabase.from("shift_types").insert(payload);
   if (result.error) throw result.error;
 }
-export async function saveShift(value: Omit<Shift, "id"> & { id?: string }) {
+export async function saveShift(value: Omit<Shift, "id" | "created_at"> & { id?: string }) {
   const uid = await userId();
   const payload = { user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes, shift_period: value.shift_period, is_pending: value.is_pending };
   const result = value.id ? await supabase.from("shifts").update(payload).eq("id", value.id) : await supabase.from("shifts").insert(payload);
   if (result.error) throw result.error;
 }
-export async function saveShifts(values: Array<Omit<Shift, "id">>) {
+export async function saveShifts(values: Array<Omit<Shift, "id" | "created_at">>) {
   const uid = await userId();
   const payload = values.map((value) => ({ user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes, shift_period: value.shift_period, is_pending: value.is_pending }));
   const result = await supabase.from("shifts").insert(payload);
