@@ -3,13 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 export type Hospital = { id: string; name: string; color: string; payment_day: number; payment_delay: number };
 export type ShiftType = { id: string; hospital_id: string | null; name: string; base_amount: number; has_variable: boolean };
 export type ShiftPeriod = "day" | "night";
-export type Shift = { id: string; shift_date: string; hospital_id: string; shift_type_id: string; base_amount: number; variable_amount: number; notes: string | null; shift_period: ShiftPeriod | null; is_pending: boolean };
+export type Shift = { id: string; shift_date: string; hospital_id: string; shift_type_id: string; base_amount: number; variable_amount: number; notes: string | null; shift_period: ShiftPeriod | null; is_pending: boolean; created_at: string };
 
 export async function loadMedicalData() {
   const [hospitals, shiftTypes, shifts, feed] = await Promise.all([
     supabase.from("hospitals").select("id,name,color,payment_day,payment_delay").order("name"),
     supabase.from("shift_types").select("id,hospital_id,name,base_amount,has_variable").order("name"),
-    supabase.from("shifts").select("id,shift_date,hospital_id,shift_type_id,base_amount,variable_amount,notes,shift_period,is_pending").order("shift_date"),
+    supabase.from("shifts").select("id,shift_date,hospital_id,shift_type_id,base_amount,variable_amount,notes,shift_period,is_pending,created_at").order("shift_date"),
     supabase.from("calendar_feeds").select("token").maybeSingle(),
   ]);
   const error = hospitals.error ?? shiftTypes.error ?? shifts.error ?? feed.error;
