@@ -35,6 +35,27 @@ export type Database = {
         }
         Relationships: []
       }
+      day_marks: {
+        Row: {
+          created_at: string
+          id: string
+          mark_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mark_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mark_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       hospitals: {
         Row: {
           color: string
