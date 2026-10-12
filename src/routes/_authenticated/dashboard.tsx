@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureCalendarFeed, loadMedicalData, loadRevenueGoals, saveRevenueGoal, removeRecord, saveHospital, saveShift, saveShifts, saveShiftType, type Hospital, type Shift, type ShiftPeriod, type ShiftType } from "@/lib/medical-data";
+import { ensureCalendarFeed, loadDayMarks, loadMedicalData, loadRevenueGoals, saveRevenueGoal, removeRecord, saveHospital, saveShift, saveShifts, saveShiftType, toggleDayMark, type Hospital, type Shift, type ShiftPeriod, type ShiftType } from "@/lib/medical-data";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
