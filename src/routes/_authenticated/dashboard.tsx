@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureCalendarFeed, loadDayMarks, loadMedicalData, loadRevenueGoals, saveRevenueGoal, removeRecord, saveHospital, saveShift, saveShifts, saveShiftType, toggleDayMark, type Hospital, type Shift, type ShiftPeriod, type ShiftType } from "@/lib/medical-data";
+import { ensureCalendarFeed, loadDayMarks, loadMedicalData, loadRevenueGoals, saveRevenueGoal, removeRecord, saveHospital, saveShift, saveShifts, saveShiftType, toggleDayMark, type DayMarkType, type Hospital, type Shift, type ShiftPeriod, type ShiftType } from "@/lib/medical-data";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
@@ -66,8 +66,8 @@ function Dashboard(){
  const receivables=shifts.filter(s=>{const h=hospitals.find(x=>x.id===s.hospital_id);return h&&isSameMonth(addMonths(parseISO(s.shift_date),h.payment_delay),paymentMonth)});
  const receivableGroups=hospitals.map(h=>({hospital:h,items:receivables.filter(s=>s.hospital_id===h.id)})).filter(g=>g.items.length).sort((a,b)=>a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
  const [openGroups,setOpenGroups]=useState<string[]>([]);
- const {data:dayMarks=[]}=useQuery({queryKey:["day-marks"],queryFn:loadDayMarks});
- async function toggleMark(ds:string,marked:boolean){await toggleDayMark(ds,!marked);await qc.invalidateQueries({queryKey:["day-marks"]});}
+ const {data:dayMarks={}}=useQuery({queryKey:["day-marks"],queryFn:loadDayMarks});
+ async function toggleMark(ds:string,mark:DayMarkType|null){const next:DayMarkType|null=mark===null?"gray":mark==="gray"?"red":null;await toggleDayMark(ds,next);await qc.invalidateQueries({queryKey:["day-marks"]});}
  const total=receivables.reduce((sum,s)=>sum+Number(s.base_amount)+Number(s.variable_amount),0);
  async function logout(){await qc.cancelQueries();qc.clear();await supabase.auth.signOut();await navigate({to:"/",replace:true});}
  async function copyFeed(){
