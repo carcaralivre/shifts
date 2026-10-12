@@ -61,7 +61,8 @@ function Dashboard(){
  const {data:goals=[]}=useQuery({queryKey:["revenue-goals"],queryFn:loadRevenueGoals});
  const defaultGoal=goals.find(g=>g.month==="default")?.amount??null; const monthKey=format(paymentMonth,"yyyy-MM"); const monthGoal=goals.find(g=>g.month===monthKey)?.amount??null;
  async function setGoal(month:string,amount:number|null){await saveRevenueGoal(month,amount);await qc.invalidateQueries({queryKey:["revenue-goals"]});}
- const monthly=shifts.filter(s=>isSameMonth(parseISO(s.shift_date),scheduleMonth));
+ const [hiddenHospitals,setHiddenHospitals]=useState<string[]>([]);
+ const monthly=shifts.filter(s=>isSameMonth(parseISO(s.shift_date),scheduleMonth)&&!hiddenHospitals.includes(s.hospital_id));
  const receivables=shifts.filter(s=>{const h=hospitals.find(x=>x.id===s.hospital_id);return h&&isSameMonth(addMonths(parseISO(s.shift_date),h.payment_delay),paymentMonth)});
  const receivableGroups=hospitals.map(h=>({hospital:h,items:receivables.filter(s=>s.hospital_id===h.id)})).filter(g=>g.items.length).sort((a,b)=>a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
  const [openGroups,setOpenGroups]=useState<string[]>([]);
