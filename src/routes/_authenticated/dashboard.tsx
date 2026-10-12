@@ -185,7 +185,7 @@ function SortableTh({label,sortKey,active,dir,onSort,align}:{label:string;sortKe
 }
 function ShiftsTableSection({shifts,hospitals,types}:{shifts:Shift[];hospitals:Hospital[];types:ShiftType[]}){
  const [month,setMonth]=useState("all");const [hospitalId,setHospitalId]=useState("all");const [typeId,setTypeId]=useState("all");const [period,setPeriod]=useState("all");
- const [sortKey,setSortKey]=useState<SortKey>("created_at");const [sortDir,setSortDir]=useState<SortDir>("desc");
+ const [sortKey,setSortKey]=useState<SortKey>("created");const [sortDir,setSortDir]=useState<SortDir>("desc");
  function chooseSort(key:SortKey){if(key===sortKey)setSortDir(d=>d==="asc"?"desc":"asc");else{setSortKey(key);setSortDir(sortDefault[key])}}
  const months=Array.from(new Set(shifts.map(s=>s.shift_date.slice(0,7)))).sort().reverse();
  const filtered=sortShifts(shifts.filter(s=>(month==="all"||s.shift_date.startsWith(month))&&(hospitalId==="all"||s.hospital_id===hospitalId)&&(typeId==="all"||s.shift_type_id===typeId)&&(period==="all"||(s.shift_period??"none")===period)),sortKey,sortDir,hospitals,types);
