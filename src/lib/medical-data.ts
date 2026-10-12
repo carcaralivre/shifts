@@ -72,3 +72,15 @@ export async function saveRevenueGoal(month: string, amount: number | null) {
     : await supabase.from("revenue_goals").upsert({ user_id: uid, month, amount }, { onConflict: "user_id,month" });
   if (result.error) throw result.error;
 }
+export async function loadDayMarks() {
+  const result = await supabase.from("day_marks").select("mark_date");
+  if (result.error) throw result.error;
+  return (result.data ?? []).map((m) => m.mark_date as string);
+}
+export async function toggleDayMark(date: string, marked: boolean) {
+  const uid = await userId();
+  const result = marked
+    ? await supabase.from("day_marks").upsert({ user_id: uid, mark_date: date }, { onConflict: "user_id,mark_date" })
+    : await supabase.from("day_marks").delete().eq("user_id", uid).eq("mark_date", date);
+  if (result.error) throw result.error;
+}

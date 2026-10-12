@@ -57,6 +57,13 @@
       "when": 1791789547400,
       "tag": "0007_cascade_hospital_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791790744036,
+      "tag": "0008_add_day_marks",
+      "breakpoints": true
     }
   ]
 }
