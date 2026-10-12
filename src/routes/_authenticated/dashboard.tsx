@@ -67,7 +67,7 @@ function Dashboard(){
  const receivableGroups=hospitals.map(h=>({hospital:h,items:receivables.filter(s=>s.hospital_id===h.id)})).filter(g=>g.items.length).sort((a,b)=>a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
  const [openGroups,setOpenGroups]=useState<string[]>([]);
  const {data:dayMarks=[]}=useQuery({queryKey:["day-marks"],queryFn:loadDayMarks});
- async function toggleMark(ds:string,marked:boolean){await toggleDayMark(ds,marked);await qc.invalidateQueries({queryKey:["day-marks"]});}
+ async function toggleMark(ds:string,marked:boolean){await toggleDayMark(ds,!marked);await qc.invalidateQueries({queryKey:["day-marks"]});}
  const total=receivables.reduce((sum,s)=>sum+Number(s.base_amount)+Number(s.variable_amount),0);
  async function logout(){await qc.cancelQueries();qc.clear();await supabase.auth.signOut();await navigate({to:"/",replace:true});}
  async function copyFeed(){
