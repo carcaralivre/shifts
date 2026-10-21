@@ -28,7 +28,8 @@ function LoginPage() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  useEffect(() => { void supabase.auth.getUser().then(({ data }) => { if (data.user) void navigate({ to: "/dashboard" }); }); }, [navigate]);
+  const [checking, setChecking] = useState(true);
+  useEffect(() => { void supabase.auth.getSession().then(({ data }) => { if (data.session) void navigate({ to: "/dashboard", replace: true }); else setChecking(false); }); }, [navigate]);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError("");
     try {
@@ -41,6 +42,7 @@ function LoginPage() {
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Não foi possível entrar."); }
     finally { setBusy(false); }
   }
+  if (checking) return <main className="flex min-h-screen items-center justify-center bg-background"><Loader2 className="animate-spin text-muted-foreground" size={20} strokeWidth={1.5} aria-label="Carregando"/></main>;
   return <main className="min-h-screen bg-background lg:grid lg:grid-cols-[1.05fr_0.95fr]">
     <section className="hidden bg-sidebar p-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between">
       <div className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground"><CalendarDays size={20} strokeWidth={1.5}/></span><span className="font-display text-2xl font-semibold">Meus Plantões</span></div>
