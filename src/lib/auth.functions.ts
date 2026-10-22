@@ -24,3 +24,13 @@ export const ensureFelipeUser = createServerFn({ method: "POST" }).handler(async
   if (error) throw new Error(error.message);
   return { ok: true, existed: false };
 });
+
+export const ensureAtilioUser = createServerFn({ method: "POST" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const email = "atilio@plantoes.local";
+  const { data } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 100 });
+  if (data.users.some((user) => user.email === email)) return { ok: true };
+  const { error } = await supabaseAdmin.auth.admin.createUser({ email, password: "amigao", email_confirm: true });
+  if (error) throw new Error(error.message);
+  return { ok: true };
+});
