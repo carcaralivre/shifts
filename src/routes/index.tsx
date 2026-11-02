@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureAtilioUser, ensureInitialUser } from "@/lib/auth.functions";
+import { ensureAtilioUser, ensureBernardoUser, ensureInitialUser } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -24,6 +24,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const setup = useServerFn(ensureInitialUser);
   const setupAtilio = useServerFn(ensureAtilioUser);
+  const setupBernardo = useServerFn(ensureBernardoUser);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -35,9 +36,10 @@ function LoginPage() {
     event.preventDefault(); setBusy(true); setError("");
     try {
       const user = username.trim().toLowerCase();
-      if (user !== "eduardo" && user !== "felipe" && user !== "atilio") throw new Error("Usuário ou senha incorretos.");
+      if (user !== "eduardo" && user !== "felipe" && user !== "atilio" && user !== "bernardo") throw new Error("Usuário ou senha incorretos.");
       if (user === "eduardo") await setup();
       if (user === "atilio") await setupAtilio();
+      if (user === "bernardo") await setupBernardo();
       const result = await supabase.auth.signInWithPassword({ email: `${user}@plantoes.local`, password });
       if (result.error) throw new Error("Usuário ou senha incorretos.");
       await navigate({ to: "/dashboard" });
