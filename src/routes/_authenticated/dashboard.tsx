@@ -26,6 +26,9 @@ const brl=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"
 const brlWhole=(v:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0}).format(v).replace(/\s/g,"");
 const monthLabel=(d:Date)=>format(d,"MMMM yyyy",{locale:ptBR});
 const periodEmoji=(period:ShiftPeriod|null)=>period==="day"?"☀️":period==="night"?"🌙":"";
+const shiftHours=(name:string|undefined)=>{const m=/(\d+)\s*h/i.exec(name??"");return m?Number(m[1]):Number.MAX_SAFE_INTEGER;};
+const dayPeriodRank=(s:Shift)=>s.shift_period==="day"?0:s.shift_period==="night"?2:1;
+function compareShiftsByDay(a:Shift,b:Shift,types:ShiftType[]){const ah=shiftHours(types.find(t=>t.id===a.shift_type_id)?.name);const bh=shiftHours(types.find(t=>t.id===b.shift_type_id)?.name);return a.shift_date.localeCompare(b.shift_date)||dayPeriodRank(a)-dayPeriodRank(b)||ah-bh||a.id.localeCompare(b.id);}
 function errorMessage(cause:unknown){
  if(cause instanceof Error)return cause.message;
  if(typeof cause==="object"&&cause!==null&&"message" in cause&&typeof cause.message==="string"){
@@ -63,7 +66,7 @@ function Dashboard(){
  const defaultGoal=goals.find(g=>g.month==="default")?.amount??null; const monthKey=format(paymentMonth,"yyyy-MM"); const monthGoal=goals.find(g=>g.month===monthKey)?.amount??null;
  async function setGoal(month:string,amount:number|null){await saveRevenueGoal(month,amount);await qc.invalidateQueries({queryKey:["revenue-goals"]});}
  const [hiddenHospitals,setHiddenHospitals]=useState<string[]>([]);
- const monthly=shifts.filter(s=>isSameMonth(parseISO(s.shift_date),scheduleMonth)&&!hiddenHospitals.includes(s.hospital_id));
+ const monthly=shifts.filter(s=>isSameMonth(parseISO(s.shift_date),scheduleMonth)&&!hiddenHospitals.includes(s.hospital_id)).sort((a,b)=>compareShiftsByDay(a,b,shiftTypes));
  const receivables=shifts.filter(s=>{const h=hospitals.find(x=>x.id===s.hospital_id);return h&&isSameMonth(addMonths(parseISO(s.shift_date),finMode==="gen"?0:h.payment_delay),paymentMonth)});
  const receivableGroups=hospitals.map(h=>({hospital:h,items:receivables.filter(s=>s.hospital_id===h.id)})).filter(g=>g.items.length).sort((a,b)=>a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
  const [openGroups,setOpenGroups]=useState<string[]>([]);
