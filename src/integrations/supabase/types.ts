@@ -115,6 +115,7 @@ export type Database = {
       }
       shift_types: {
         Row: {
+          archived: boolean
           base_amount: number
           created_at: string
           has_variable: boolean
@@ -124,6 +125,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
           base_amount?: number
           created_at?: string
           has_variable?: boolean
@@ -133,6 +135,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
           base_amount?: number
           created_at?: string
           has_variable?: boolean
