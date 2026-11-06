@@ -1011,7 +1011,7 @@ function ShiftDialog({
           <div className="space-y-2">
             <Label>Hospital</Label>
             <div className="grid grid-cols-2 gap-2" role="group" aria-label="Hospital">
-              {hospitals.map((h) => {
+              {hospitals.filter((h) => !h.archived || h.id === shift?.hospital_id).map((h) => {
                 const selected = h.id === hospitalId;
                 return (
                   <Button
@@ -1349,7 +1349,7 @@ function TypeDialog({
                 <SelectValue placeholder="Selecione um hospital" />
               </SelectTrigger>
               <SelectContent>
-                {hospitals.map((h) => (
+                {hospitals.filter((h) => !h.archived || h.id === value?.hospital_id).map((h) => (
                   <SelectItem key={h.id} value={h.id}>
                     {h.name}
                   </SelectItem>
