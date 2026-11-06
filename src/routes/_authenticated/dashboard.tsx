@@ -51,6 +51,7 @@ import {
   loadRevenueGoals,
   saveRevenueGoal,
   removeRecord,
+  archiveShiftType,
   saveHospital,
   saveShift,
   saveShifts,
@@ -457,7 +458,9 @@ function Dashboard() {
           <DialogHeader>
             <DialogTitle>Confirmar exclusão</DialogTitle>
             <DialogDescription>
-              Deseja excluir {deleteTarget?.label}? Esta ação não pode ser desfeita.
+              {deleteTarget?.table === "shift_types"
+                ? `Deseja excluir o tipo ${deleteTarget.label}? Ele deixa de aparecer para novos plantões, mas os plantões já lançados continuam no calendário, na lista e nos cálculos.`
+                : `Deseja excluir ${deleteTarget?.label}? Esta ação não pode ser desfeita.`}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -468,7 +471,8 @@ function Dashboard() {
               variant="destructive"
               onClick={async () => {
                 if (deleteTarget) {
-                  await removeRecord(deleteTarget.table, deleteTarget.id);
+                  if (deleteTarget.table === "shift_types") await archiveShiftType(deleteTarget.id);
+                  else await removeRecord(deleteTarget.table, deleteTarget.id);
                   setDeleteTarget(null);
                   await refresh();
                 }
@@ -796,7 +800,7 @@ function SettingsView({
           </Button>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {types.map((t) => (
+          {types.filter((t) => !t.archived).map((t) => (
             <article key={t.id} className="rounded-xl border bg-surface p-4">
               <div className="flex items-start justify-between">
                 <div>
@@ -884,7 +888,7 @@ function ShiftDialog({
   const initialHospital = shift?.hospital_id ?? hospitals[0]?.id ?? "";
   const [hospitalId, setHospitalId] = useState(initialHospital);
   const availableTypes = types.filter(
-    (t) => t.hospital_id === hospitalId || (shift?.shift_type_id === t.id && t.hospital_id === null),
+    (t) => shift?.shift_type_id === t.id || (!t.archived && t.hospital_id === hospitalId),
   );
   const [typeId, setTypeId] = useState(shift?.shift_type_id ?? availableTypes[0]?.id ?? "");
   const [dates, setDates] = useState([shift?.shift_date ?? format(new Date(), "yyyy-MM-dd")]);
@@ -896,7 +900,7 @@ function ShiftDialog({
     if (!open) return;
     const nextHospital = shift?.hospital_id ?? hospitals[0]?.id ?? "";
     const nextTypes = types.filter(
-      (t) => t.hospital_id === nextHospital || (shift?.shift_type_id === t.id && t.hospital_id === null),
+      (t) => shift?.shift_type_id === t.id || (!t.archived && t.hospital_id === nextHospital),
     );
     setHospitalId(nextHospital);
     setTypeId(shift?.shift_type_id ?? nextTypes[0]?.id ?? "");
@@ -908,7 +912,7 @@ function ShiftDialog({
   }, [open, shift, initialDate, hospitals, types]);
   function chooseHospital(id: string) {
     setHospitalId(id);
-    setTypeId(types.find((t) => t.hospital_id === id)?.id ?? "");
+    setTypeId(types.find((t) => !t.archived && t.hospital_id === id)?.id ?? "");
   }
   function updateDate(index: number, value: string) {
     setDates((current) => current.map((date, i) => (i === index ? value : date)));
