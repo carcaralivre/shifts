@@ -71,6 +71,13 @@
       "when": 1793993096788,
       "tag": "0009_archive_shift_types",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793993207847,
+      "tag": "0010_archive_hospitals",
+      "breakpoints": true
     }
   ]
 }
