@@ -64,6 +64,13 @@
       "when": 1791790744036,
       "tag": "0008_add_day_marks",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793993096788,
+      "tag": "0009_archive_shift_types",
+      "breakpoints": true
     }
   ]
 }

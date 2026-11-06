@@ -1,14 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type Hospital = { id: string; name: string; color: string; payment_day: number; payment_delay: number };
-export type ShiftType = { id: string; hospital_id: string | null; name: string; base_amount: number; has_variable: boolean };
+export type ShiftType = { id: string; hospital_id: string | null; name: string; base_amount: number; has_variable: boolean; archived: boolean };
 export type ShiftPeriod = "day" | "night";
 export type Shift = { id: string; shift_date: string; hospital_id: string; shift_type_id: string; base_amount: number; variable_amount: number; notes: string | null; shift_period: ShiftPeriod | null; is_pending: boolean; created_at: string };
 
 export async function loadMedicalData() {
   const [hospitals, shiftTypes, shifts, feed] = await Promise.all([
     supabase.from("hospitals").select("id,name,color,payment_day,payment_delay").order("name"),
-    supabase.from("shift_types").select("id,hospital_id,name,base_amount,has_variable").order("name"),
+    supabase.from("shift_types").select("id,hospital_id,name,base_amount,has_variable,archived").order("name"),
     supabase.from("shifts").select("id,shift_date,hospital_id,shift_type_id,base_amount,variable_amount,notes,shift_period,is_pending,created_at").order("shift_date"),
     supabase.from("calendar_feeds").select("token").maybeSingle(),
   ]);
@@ -28,7 +28,7 @@ export async function saveHospital(value: Omit<Hospital, "id"> & { id?: string }
   const result = value.id ? await supabase.from("hospitals").update(payload).eq("id", value.id) : await supabase.from("hospitals").insert(payload);
   if (result.error) throw result.error;
 }
-export async function saveShiftType(value: Omit<ShiftType, "id"> & { id?: string }) {
+export async function saveShiftType(value: Omit<ShiftType, "id" | "archived"> & { id?: string }) {
   const uid = await userId();
   const payload = { user_id: uid, hospital_id: value.hospital_id, name: value.name, base_amount: value.base_amount, has_variable: value.has_variable };
   const result = value.id ? await supabase.from("shift_types").update(payload).eq("id", value.id) : await supabase.from("shift_types").insert(payload);
@@ -44,6 +44,10 @@ export async function saveShifts(values: Array<Omit<Shift, "id" | "created_at">>
   const uid = await userId();
   const payload = values.map((value) => ({ user_id: uid, shift_date: value.shift_date, hospital_id: value.hospital_id, shift_type_id: value.shift_type_id, base_amount: value.base_amount, variable_amount: value.variable_amount, notes: value.notes, shift_period: value.shift_period, is_pending: value.is_pending }));
   const result = await supabase.from("shifts").insert(payload);
+  if (result.error) throw result.error;
+}
+export async function archiveShiftType(id: string) {
+  const result = await supabase.from("shift_types").update({ archived: true }).eq("id", id);
   if (result.error) throw result.error;
 }
 export async function removeRecord(table: "hospitals" | "shift_types" | "shifts", id: string) {
