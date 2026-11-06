@@ -52,6 +52,7 @@ import {
   saveRevenueGoal,
   removeRecord,
   archiveShiftType,
+  archiveHospital,
   saveHospital,
   saveShift,
   saveShifts,
@@ -458,7 +459,9 @@ function Dashboard() {
           <DialogHeader>
             <DialogTitle>Confirmar exclusão</DialogTitle>
             <DialogDescription>
-              {deleteTarget?.table === "shift_types"
+              {deleteTarget?.table === "hospitals"
+                ? `Deseja excluir o hospital ${deleteTarget.label}? Ele e seus tipos deixam de aparecer para novos plantões, mas os plantões já lançados continuam no calendário, na lista e nos cálculos.`
+                : deleteTarget?.table === "shift_types"
                 ? `Deseja excluir o tipo ${deleteTarget.label}? Ele deixa de aparecer para novos plantões, mas os plantões já lançados continuam no calendário, na lista e nos cálculos.`
                 : `Deseja excluir ${deleteTarget?.label}? Esta ação não pode ser desfeita.`}
             </DialogDescription>
@@ -472,6 +475,7 @@ function Dashboard() {
               onClick={async () => {
                 if (deleteTarget) {
                   if (deleteTarget.table === "shift_types") await archiveShiftType(deleteTarget.id);
+                  else if (deleteTarget.table === "hospitals") await archiveHospital(deleteTarget.id);
                   else await removeRecord(deleteTarget.table, deleteTarget.id);
                   setDeleteTarget(null);
                   await refresh();
@@ -760,7 +764,7 @@ function SettingsView({
           </Button>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {hospitals.map((h) => (
+          {hospitals.filter((h) => !h.archived).map((h) => (
             <article key={h.id} className="rounded-xl border bg-surface p-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -788,7 +792,7 @@ function SettingsView({
               </div>
             </article>
           ))}
-          {!hospitals.length && <Empty text="Cadastre seu primeiro hospital." />}
+          {!hospitals.some((h) => !h.archived) && <Empty text="Cadastre seu primeiro hospital." />}
         </div>
       </section>
       <section className="mb-8">
@@ -885,7 +889,7 @@ function ShiftDialog({
   onSaved: () => Promise<unknown>;
   onDelete?: () => void;
 }) {
-  const initialHospital = shift?.hospital_id ?? hospitals[0]?.id ?? "";
+  const initialHospital = shift?.hospital_id ?? hospitals.find((h) => !h.archived)?.id ?? "";
   const [hospitalId, setHospitalId] = useState(initialHospital);
   const availableTypes = types.filter(
     (t) => shift?.shift_type_id === t.id || (!t.archived && t.hospital_id === hospitalId),
@@ -898,7 +902,7 @@ function ShiftDialog({
   const [error, setError] = useState("");
   useEffect(() => {
     if (!open) return;
-    const nextHospital = shift?.hospital_id ?? hospitals[0]?.id ?? "";
+    const nextHospital = shift?.hospital_id ?? hospitals.find((h) => !h.archived)?.id ?? "";
     const nextTypes = types.filter(
       (t) => shift?.shift_type_id === t.id || (!t.archived && t.hospital_id === nextHospital),
     );
@@ -1007,7 +1011,7 @@ function ShiftDialog({
           <div className="space-y-2">
             <Label>Hospital</Label>
             <div className="grid grid-cols-2 gap-2" role="group" aria-label="Hospital">
-              {hospitals.map((h) => {
+              {hospitals.filter((h) => !h.archived || h.id === shift?.hospital_id).map((h) => {
                 const selected = h.id === hospitalId;
                 return (
                   <Button
@@ -1287,7 +1291,7 @@ function TypeDialog({
   useEffect(() => {
     if (open) {
       setVariable(value?.has_variable ?? false);
-      setHospitalId(value?.hospital_id ?? hospitals[0]?.id ?? "");
+      setHospitalId(value?.hospital_id ?? hospitals.find((h) => !h.archived)?.id ?? "");
       setSaving(false);
       setError("");
     }
@@ -1345,7 +1349,7 @@ function TypeDialog({
                 <SelectValue placeholder="Selecione um hospital" />
               </SelectTrigger>
               <SelectContent>
-                {hospitals.map((h) => (
+                {hospitals.filter((h) => !h.archived || h.id === value?.hospital_id).map((h) => (
                   <SelectItem key={h.id} value={h.id}>
                     {h.name}
                   </SelectItem>

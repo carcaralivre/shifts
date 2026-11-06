@@ -1,13 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type Hospital = { id: string; name: string; color: string; payment_day: number; payment_delay: number };
+export type Hospital = { id: string; name: string; color: string; payment_day: number; payment_delay: number; archived: boolean };
 export type ShiftType = { id: string; hospital_id: string | null; name: string; base_amount: number; has_variable: boolean; archived: boolean };
 export type ShiftPeriod = "day" | "night";
 export type Shift = { id: string; shift_date: string; hospital_id: string; shift_type_id: string; base_amount: number; variable_amount: number; notes: string | null; shift_period: ShiftPeriod | null; is_pending: boolean; created_at: string };
 
 export async function loadMedicalData() {
   const [hospitals, shiftTypes, shifts, feed] = await Promise.all([
-    supabase.from("hospitals").select("id,name,color,payment_day,payment_delay").order("name"),
+    supabase.from("hospitals").select("id,name,color,payment_day,payment_delay,archived").order("name"),
     supabase.from("shift_types").select("id,hospital_id,name,base_amount,has_variable,archived").order("name"),
     supabase.from("shifts").select("id,shift_date,hospital_id,shift_type_id,base_amount,variable_amount,notes,shift_period,is_pending,created_at").order("shift_date"),
     supabase.from("calendar_feeds").select("token").maybeSingle(),
@@ -22,7 +22,7 @@ async function userId() {
   if (error || !data.user) throw new Error("Sessão expirada.");
   return data.user.id;
 }
-export async function saveHospital(value: Omit<Hospital, "id"> & { id?: string }) {
+export async function saveHospital(value: Omit<Hospital, "id" | "archived"> & { id?: string }) {
   const uid = await userId();
   const payload = { user_id: uid, name: value.name, color: value.color, payment_day: value.payment_day, payment_delay: value.payment_delay };
   const result = value.id ? await supabase.from("hospitals").update(payload).eq("id", value.id) : await supabase.from("hospitals").insert(payload);
@@ -48,6 +48,12 @@ export async function saveShifts(values: Array<Omit<Shift, "id" | "created_at">>
 }
 export async function archiveShiftType(id: string) {
   const result = await supabase.from("shift_types").update({ archived: true }).eq("id", id);
+  if (result.error) throw result.error;
+}
+export async function archiveHospital(id: string) {
+  const types = await supabase.from("shift_types").update({ archived: true }).eq("hospital_id", id);
+  if (types.error) throw types.error;
+  const result = await supabase.from("hospitals").update({ archived: true }).eq("id", id);
   if (result.error) throw result.error;
 }
 export async function removeRecord(table: "hospitals" | "shift_types" | "shifts", id: string) {

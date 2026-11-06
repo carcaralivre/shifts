@@ -61,6 +61,7 @@ export type Database = {
       }
       hospitals: {
         Row: {
+          archived: boolean
           color: string
           created_at: string
           id: string
@@ -70,6 +71,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
           color?: string
           created_at?: string
           id?: string
@@ -79,6 +81,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
           color?: string
           created_at?: string
           id?: string
