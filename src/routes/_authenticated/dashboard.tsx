@@ -198,6 +198,7 @@ function Dashboard() {
     .filter((g) => g.items.length)
     .sort((a, b) => a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
   const [openGroups, setOpenGroups] = useState<string[]>([]);
+  const [monthListOpen, setMonthListOpen] = useState(false);
   const { data: dayMarks = {} } = useQuery({ queryKey: ["day-marks"], queryFn: loadDayMarks });
   const { data: paymentsReceived = [] } = useQuery({ queryKey: ["payments-received"], queryFn: loadPaymentsReceived });
   async function toggleReceived(hospitalId: string, month: string) {
