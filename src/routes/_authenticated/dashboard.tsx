@@ -48,6 +48,7 @@ import {
   ensureCalendarFeed,
   loadDayMarks,
   loadMedicalData,
+  loadPaymentsReceived,
   loadRevenueGoals,
   saveRevenueGoal,
   removeRecord,
