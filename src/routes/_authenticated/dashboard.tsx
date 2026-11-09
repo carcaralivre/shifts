@@ -337,28 +337,41 @@ function Dashboard() {
                   }}
                 />
                 <div className="mt-6">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h2 className="font-display text-lg font-semibold">Plantões do mês</h2>
+                  <button
+                    type="button"
+                    aria-expanded={monthListOpen}
+                    onClick={() => setMonthListOpen((v) => !v)}
+                    className="mb-3 flex w-full items-center justify-between rounded-lg px-1 py-1 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ChevronDown
+                        className={`size-4 text-muted-foreground ${monthListOpen ? "rotate-180" : ""}`}
+                        strokeWidth={1.5}
+                      />
+                      <h2 className="font-display text-lg font-semibold">Plantões do mês</h2>
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       {monthly.length} {monthly.length === 1 ? "plantão" : "plantões"}
                     </span>
-                  </div>
-                  <div className="space-y-3">
-                    {monthly.map((s) => (
-                      <ShiftRow
-                        key={s.id}
-                        shift={s}
-                        hospital={hospitals.find((h) => h.id === s.hospital_id)}
-                        type={shiftTypes.find((t) => t.id === s.shift_type_id)}
-                        onEdit={() => {
-                          setEditingShift(s);
-                          setShiftOpen(true);
-                        }}
-                        onDelete={() => setDeleteTarget({ table: "shifts", id: s.id, label: "este plantão" })}
-                      />
-                    ))}
-                    {!monthly.length && <Empty text="Nenhum plantão neste mês." />}
-                  </div>
+                  </button>
+                  {monthListOpen && (
+                    <div className="space-y-3">
+                      {monthly.map((s) => (
+                        <ShiftRow
+                          key={s.id}
+                          shift={s}
+                          hospital={hospitals.find((h) => h.id === s.hospital_id)}
+                          type={shiftTypes.find((t) => t.id === s.shift_type_id)}
+                          onEdit={() => {
+                            setEditingShift(s);
+                            setShiftOpen(true);
+                          }}
+                          onDelete={() => setDeleteTarget({ table: "shifts", id: s.id, label: "este plantão" })}
+                        />
+                      ))}
+                      {!monthly.length && <Empty text="Nenhum plantão neste mês." />}
+                    </div>
+                  )}
                 </div>
               </section>
               <aside className="min-w-0 border-t pt-6 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
