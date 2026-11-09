@@ -82,6 +82,18 @@ export async function saveRevenueGoal(month: string, amount: number | null) {
     : await supabase.from("revenue_goals").upsert({ user_id: uid, month, amount }, { onConflict: "user_id,month" });
   if (result.error) throw result.error;
 }
+export async function loadPaymentsReceived() {
+  const result = await supabase.from("payments_received").select("hospital_id,month");
+  if (result.error) throw result.error;
+  return (result.data ?? []).map((p) => `${p.hospital_id}:${p.month}`);
+}
+export async function togglePaymentReceived(hospitalId: string, month: string, received: boolean) {
+  const uid = await userId();
+  const result = received
+    ? await supabase.from("payments_received").insert({ user_id: uid, hospital_id: hospitalId, month })
+    : await supabase.from("payments_received").delete().eq("user_id", uid).eq("hospital_id", hospitalId).eq("month", month);
+  if (result.error) throw result.error;
+}
 export type DayMarkType = "gray" | "red";
 export async function loadDayMarks() {
   const result = await supabase.from("day_marks").select("mark_date,mark_type");

@@ -48,6 +48,7 @@ import {
   ensureCalendarFeed,
   loadDayMarks,
   loadMedicalData,
+  loadPaymentsReceived,
   loadRevenueGoals,
   saveRevenueGoal,
   removeRecord,
@@ -58,6 +59,7 @@ import {
   saveShifts,
   saveShiftType,
   toggleDayMark,
+  togglePaymentReceived,
   type DayMarkType,
   type Hospital,
   type Shift,
@@ -197,6 +199,16 @@ function Dashboard() {
     .sort((a, b) => a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const { data: dayMarks = {} } = useQuery({ queryKey: ["day-marks"], queryFn: loadDayMarks });
+  const { data: paymentsReceived = [] } = useQuery({ queryKey: ["payments-received"], queryFn: loadPaymentsReceived });
+  async function toggleReceived(hospitalId: string, month: string) {
+    const key = `${hospitalId}:${month}`;
+    const next = !paymentsReceived.includes(key);
+    qc.setQueryData<string[]>(["payments-received"], (old) =>
+      next ? [...(old ?? []), key] : (old ?? []).filter((k) => k !== key),
+    );
+    await togglePaymentReceived(hospitalId, month, next);
+    await qc.invalidateQueries({ queryKey: ["payments-received"] });
+  }
   async function toggleMark(ds: string, mark: DayMarkType | null) {
     const next: DayMarkType | null = mark === null ? "gray" : mark === "gray" ? "red" : null;
     qc.setQueryData<Record<string, DayMarkType>>(["day-marks"], (old) => {
@@ -397,6 +409,9 @@ function Dashboard() {
                           c.includes(hospital.id) ? c.filter((id) => id !== hospital.id) : [...c, hospital.id],
                         )
                       }
+                      showReceived={finMode === "pay"}
+                      received={paymentsReceived.includes(`${hospital.id}:${monthKey}`)}
+                      onToggleReceived={() => toggleReceived(hospital.id, monthKey)}
                     />
                   ))}
                   {!receivableGroups.length && (
@@ -649,29 +664,51 @@ function PaymentGroup({
   items,
   open,
   onToggle,
+  showReceived = false,
+  received = false,
+  onToggleReceived,
 }: {
   hospital: Hospital;
   items: Shift[];
   open: boolean;
   onToggle: () => void;
+  showReceived?: boolean;
+  received?: boolean;
+  onToggleReceived?: () => void;
 }) {
   const sum = items.reduce((acc, s) => acc + Number(s.base_amount) + Number(s.variable_amount), 0);
   return (
     <section className="rounded-xl border bg-surface">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={onToggle}
-        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current"
-      >
-        <ChevronDown
-          className={`size-4 shrink-0 text-muted-foreground ${open ? "rotate-180" : ""}`}
-          strokeWidth={1.5}
-        />
-        <span className={`size-3 shrink-0 rounded-full ${colors[hospital.color]}`} />
-        <span className="min-w-0 flex-1 truncate text-sm font-medium">{hospital.name}</span>
-        <span className="shrink-0 font-mono text-sm font-semibold">{brl(sum)}</span>
-      </button>
+      <div className="flex items-center">
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={onToggle}
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current"
+        >
+          <ChevronDown
+            className={`size-4 shrink-0 text-muted-foreground ${open ? "rotate-180" : ""}`}
+            strokeWidth={1.5}
+          />
+          <span className={`size-3 shrink-0 rounded-full ${colors[hospital.color]}`} />
+          <span className="min-w-0 flex-1 truncate text-sm font-medium">{hospital.name}</span>
+          <span className="shrink-0 font-mono text-sm font-semibold">{brl(sum)}</span>
+        </button>
+        {showReceived && (
+          <button
+            type="button"
+            aria-pressed={received}
+            aria-label={received ? `Recebimento de ${hospital.name} marcado como recebido` : `Marcar recebimento de ${hospital.name} como recebido`}
+            title={received ? "Recebido" : "Marcar como recebido"}
+            onClick={onToggleReceived}
+            className={`mr-3 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current ${
+              received ? "text-primary" : "text-muted-foreground/50 hover:text-muted-foreground"
+            }`}
+          >
+            <Check className="size-4" strokeWidth={1.5} />
+          </button>
+        )}
+      </div>
       {open && (
         <div className="px-4 pb-2">
           {items.map((s) => (
