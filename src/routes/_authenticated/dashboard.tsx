@@ -59,6 +59,7 @@ import {
   saveShifts,
   saveShiftType,
   toggleDayMark,
+  togglePaymentReceived,
   type DayMarkType,
   type Hospital,
   type Shift,
@@ -198,6 +199,16 @@ function Dashboard() {
     .sort((a, b) => a.items[0]!.shift_date.localeCompare(b.items[0]!.shift_date));
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const { data: dayMarks = {} } = useQuery({ queryKey: ["day-marks"], queryFn: loadDayMarks });
+  const { data: paymentsReceived = [] } = useQuery({ queryKey: ["payments-received"], queryFn: loadPaymentsReceived });
+  async function toggleReceived(hospitalId: string, month: string) {
+    const key = `${hospitalId}:${month}`;
+    const next = !paymentsReceived.includes(key);
+    qc.setQueryData<string[]>(["payments-received"], (old) =>
+      next ? [...(old ?? []), key] : (old ?? []).filter((k) => k !== key),
+    );
+    await togglePaymentReceived(hospitalId, month, next);
+    await qc.invalidateQueries({ queryKey: ["payments-received"] });
+  }
   async function toggleMark(ds: string, mark: DayMarkType | null) {
     const next: DayMarkType | null = mark === null ? "gray" : mark === "gray" ? "red" : null;
     qc.setQueryData<Record<string, DayMarkType>>(["day-marks"], (old) => {
