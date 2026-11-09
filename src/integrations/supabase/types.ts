@@ -92,6 +92,38 @@ export type Database = {
         }
         Relationships: []
       }
+      payments_received: {
+        Row: {
+          created_at: string
+          hospital_id: string
+          id: string
+          month: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hospital_id: string
+          id?: string
+          month: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hospital_id?: string
+          id?: string
+          month?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_received_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       revenue_goals: {
         Row: {
           amount: number

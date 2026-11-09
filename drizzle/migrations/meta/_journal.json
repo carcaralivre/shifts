@@ -78,6 +78,13 @@
       "when": 1793993207847,
       "tag": "0010_archive_hospitals",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794229889717,
+      "tag": "0011_create_payments_received",
+      "breakpoints": true
     }
   ]
 }
