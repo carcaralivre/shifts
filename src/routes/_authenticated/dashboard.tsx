@@ -715,8 +715,10 @@ function PaymentGroup({
             aria-label={received ? `Recebimento de ${hospital.name} marcado como recebido` : `Marcar recebimento de ${hospital.name} como recebido`}
             title={received ? "Recebido" : "Marcar como recebido"}
             onClick={onToggleReceived}
-            className={`mr-3 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current ${
-              received ? "text-primary" : "text-muted-foreground/50 hover:text-muted-foreground"
+            className={`mr-3 flex size-7 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current ${
+              received
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground/60 hover:border-muted-foreground/50 hover:text-muted-foreground"
             }`}
           >
             <Check className="size-4" strokeWidth={1.5} />
