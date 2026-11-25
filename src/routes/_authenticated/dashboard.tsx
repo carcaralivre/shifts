@@ -109,6 +109,11 @@ const brlWhole = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 })
     .format(v)
     .replace(/\s/g, "");
+const brlCompact = (v: number) => {
+  if (Math.abs(v) < 10000) return brlWhole(v);
+  const thousands = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(v / 1000);
+  return `R$${thousands.replace(/,0$/, "")}K`;
+};
 const monthLabel = (d: Date) => format(d, "MMMM yyyy", { locale: ptBR });
 const periodEmoji = (period: ShiftPeriod | null) => (period === "day" ? "☀️" : period === "night" ? "🌙" : "");
 const shiftHours = (name: string | undefined) => {
@@ -620,7 +625,7 @@ function Calendar({
                           {h?.name ?? "Hospital"}
                         </span>
                         <span className="hidden shrink-0 font-mono text-[9px] leading-3 sm:inline">
-                          {brlWhole(total)}
+                          {brlCompact(total)}
                         </span>
                       </span>
                     </button>
